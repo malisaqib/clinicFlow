@@ -1,5 +1,29 @@
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 
+type SafeSupabaseError = {
+  code?: string;
+  message: string;
+  details?: string;
+  hint?: string;
+};
+
+export class ClinicQueryError extends Error {
+  readonly code?: string;
+  readonly details?: string;
+  readonly hint?: string;
+
+  constructor(
+    readonly stage: string,
+    error: SafeSupabaseError,
+  ) {
+    super(`Unable to fetch ${stage}: ${error.message}`);
+    this.name = "ClinicQueryError";
+    this.code = error.code;
+    this.details = error.details;
+    this.hint = error.hint;
+  }
+}
+
 export type Clinic = {
   id: string;
   name: string;
@@ -68,18 +92,19 @@ export type ClinicBySlug = {
 
 export async function getClinicBySlug(slug: string): Promise<ClinicBySlug | null> {
   const supabase = createAdminSupabaseClient();
+  const normalizedSlug = slug.trim();
 
   const { data: clinic, error: clinicError } = await supabase
     .from("clinics")
     .select(
       "id, name, slug, category, city, area, address, phone, whatsapp, email, logo_url, description, status",
     )
-    .eq("slug", slug)
+    .eq("slug", normalizedSlug)
     .eq("status", "active")
     .maybeSingle();
 
   if (clinicError) {
-    throw new Error(`Unable to fetch clinic: ${clinicError.message}`);
+    throwQueryError("clinic", clinicError);
   }
 
   if (!clinic) {
@@ -118,19 +143,19 @@ export async function getClinicBySlug(slug: string): Promise<ClinicBySlug | null
   ]);
 
   if (servicesError) {
-    throw new Error(`Unable to fetch clinic services: ${servicesError.message}`);
+    throwQueryError("clinic services", servicesError);
   }
 
   if (doctorsError) {
-    throw new Error(`Unable to fetch clinic doctors: ${doctorsError.message}`);
+    throwQueryError("clinic doctors", doctorsError);
   }
 
   if (workingHoursError) {
-    throw new Error(`Unable to fetch clinic working hours: ${workingHoursError.message}`);
+    throwQueryError("clinic working hours", workingHoursError);
   }
 
   if (knowledgeError) {
-    throw new Error(`Unable to fetch clinic knowledge: ${knowledgeError.message}`);
+    throwQueryError("clinic knowledge", knowledgeError);
   }
 
   return {
@@ -140,4 +165,16 @@ export async function getClinicBySlug(slug: string): Promise<ClinicBySlug | null
     workingHours: workingHours ?? [],
     knowledge: knowledge ?? [],
   };
+}
+
+function throwQueryError(stage: string, error: SafeSupabaseError): never {
+  console.error("[clinic-api] Supabase query failed", {
+    stage,
+    code: error.code,
+    message: error.message,
+    details: error.details,
+    hint: error.hint,
+  });
+
+  throw new ClinicQueryError(stage, error);
 }
