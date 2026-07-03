@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { requireAdminApiKey } from "@/lib/admin/auth";
 import { updateClinicDoctor } from "@/lib/admin/clinicSetup";
 import { adminApiErrorResponse } from "@/lib/admin/responses";
 import { readJsonBody } from "@/lib/admin/validators";
@@ -12,6 +13,12 @@ type RouteContext = {
 };
 
 export async function PATCH(request: NextRequest, context: RouteContext) {
+  const authError = requireAdminApiKey(request);
+
+  if (authError) {
+    return authError;
+  }
+
   const { slug, doctorId } = await context.params;
 
   try {
