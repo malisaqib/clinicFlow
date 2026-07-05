@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+/*
+  ClinicFlow — "Apothecary daylight" design system.
+
+  Semantic tokens live as plain CSS variables so the SAME utility (e.g. bg-surface,
+  text-brand) resolves to a warm/calm value on public pages and a cooler/denser value
+  on the internal work tool. `@theme inline` maps Tailwind utilities to the live vars,
+  so [data-surface="internal"] overrides take effect at runtime.
+*/
+
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-tint: var(--brand-tint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-tint: var(--accent-tint);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  /* Lead status palette — functional, derived from the brand family. */
+  --color-st-new: #c17d1f;
+  --color-st-new-bg: #f7ecd6;
+  --color-st-contacted: #45708a;
+  --color-st-contacted-bg: #e0ebf1;
+  --color-st-confirmed: #2c7a56;
+  --color-st-confirmed-bg: #d9ecdf;
+  --color-st-completed: #566a63;
+  --color-st-completed-bg: #e4eae7;
+  --color-st-cancelled: #a75647;
+  --color-st-cancelled-bg: #f2ddd8;
+  --color-st-lost: #8a938d;
+  --color-st-lost-bg: #e8ebe8;
+
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-instrument), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
+
+  --shadow-calm: 0 1px 2px rgba(20, 32, 27, 0.04), 0 12px 30px -18px rgba(20, 32, 27, 0.35);
+  --shadow-lift: 0 2px 6px rgba(20, 32, 27, 0.06), 0 24px 48px -28px rgba(20, 32, 27, 0.5);
+}
+
+/* Public / default surface — warm, calm, reassuring. */
+:root {
+  --surface: #eef0ea;
+  --surface-2: #f7f8f3;
+  --surface-3: #ffffff;
+  --ink: #14201b;
+  --ink-soft: #33443c;
+  --muted: #5c6b62;
+  --brand: #173f35;
+  --brand-strong: #0e2b24;
+  --brand-tint: #e2ebe1;
+  --accent: #e7a34a;
+  --accent-strong: #c9832c;
+  --accent-tint: #f8ecd7;
+  --line: #d7ddd3;
+  --line-strong: #c2cbbe;
+
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Internal / dashboard surface — cooler, denser, tonally related work tool. */
+[data-surface="internal"] {
+  --surface: #e9ede9;
+  --surface-2: #f4f6f3;
+  --surface-3: #ffffff;
+  --ink: #16211d;
+  --ink-soft: #38473f;
+  --muted: #63716a;
+  --brand: #173f35;
+  --brand-strong: #0e2b24;
+  --brand-tint: #dce7dd;
+  --accent: #e7a34a;
+  --accent-strong: #c9832c;
+  --accent-tint: #f6e9d2;
+  --line: #d3dbd5;
+  --line-strong: #bcc7bf;
+}
+
+@layer base {
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv01", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--brand-strong);
+  }
+
+  /* Visible keyboard focus everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--accent-strong);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    color: var(--brand-strong);
+  }
+
+  /* Thin, calm scrollbars on internal dense views. */
+  [data-surface="internal"] ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  [data-surface="internal"] ::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border-radius: 999px;
+    border: 3px solid var(--surface-2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer utilities {
+  /* Warm paper texture for public hero surfaces — CSS-only, no image assets. */
+  .paper {
+    background-image: var(--paper-grain);
+    background-size: 160px;
+    background-blend-mode: multiply;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+
+  /* Soft daylight glow used behind hero content. */
+  .daylight {
+    background:
+      radial-gradient(60% 55% at 78% 12%, rgba(231, 163, 74, 0.18), transparent 60%),
+      radial-gradient(50% 60% at 8% 6%, rgba(23, 63, 53, 0.1), transparent 55%);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
