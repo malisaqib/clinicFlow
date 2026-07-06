@@ -36,16 +36,30 @@ ClinicFlow is not an AI doctor. It must not diagnose, prescribe medicine, sugges
 
 7-day MVP in progress.
 
-Current foundation includes planning docs, coding agent rules, Supabase schema, and demo seed data. The full app has not been built yet.
+Backend APIs (clinics, appointment requests, admin onboarding, AI receptionist) and the
+Supabase schema + demo seed are in place. The Next.js frontend is now built:
+
+- Public clinic page at `/[slug]` (services, doctors, availability ribbon, booking form).
+- Appointment request flow with a clear "request, not a confirmed booking" confirmation.
+- AI receptionist chat widget with UI-level medical hand-off.
+- Clinic dashboard (`/dashboard`) for lead triage.
+- Admin onboarding (`/admin`) for clinic profile, hours, services, doctors, knowledge.
+
+Auth is still **mocked** (Supabase Auth is planned). The internal `/dashboard` and `/admin`
+routes are gated behind a mock staff session isolated in `lib/auth/mock-auth.tsx`, and the
+dashboard shows a visible "Auth is mocked" banner. Swap that one file when real auth ships.
 
 ## Local Setup
 
 1. Clone the repository.
-2. Install dependencies after the Next.js app is scaffolded.
-3. Copy `.env.example` to `.env.local`.
+2. Install dependencies: `npm install`.
+3. Copy `.env.example` to `.env.local` (an `.env.local` is already present — fill in the blanks).
 4. Fill in Supabase and LLM environment variables.
 5. Run the Supabase migration and seed files.
-6. Start the local development server after the app is scaffolded.
+6. Start the local development server: `npm run dev`, then open `http://localhost:3000`.
+
+Until Supabase env vars are filled in, public pages and the dashboard render a friendly
+"Connect Supabase" notice instead of crashing.
 
 ## Environment Variables
 
